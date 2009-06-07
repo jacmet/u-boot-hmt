@@ -37,6 +37,14 @@
 #define MPLL 1
 #define EPLL 2
 
+#ifdef CONFIG_S3C6400
+#define CPUNAME "S3C6400"
+#elif CONFIG_S3C6410
+#define CPUNAME "S3C6410"
+#else
+#define CPUNAME "S3C64XX"
+#endif
+
 /* ------------------------------------------------------------------------- */
 /*
  * NOTE: This describes the proper use of this file.
@@ -132,7 +140,7 @@ ulong get_UCLK(void)
 
 int print_cpuinfo(void)
 {
-	printf("\nCPU:     S3C6400@%luMHz\n", get_ARMCLK() / 1000000);
+	printf("\nCPU:     " CPUNAME "@%luMHz\n", get_ARMCLK() / 1000000);
 	printf("         Fclk = %luMHz, Hclk = %luMHz, Pclk = %luMHz ",
 	       get_FCLK() / 1000000, get_HCLK() / 1000000,
 	       get_PCLK() / 1000000);
