@@ -3252,6 +3252,13 @@ smdk6400_config	:	unconfig
 	fi
 	@echo "CONFIG_NAND_U_BOOT = y" >> $(obj)include/config.mk
 
+hmt_config		: unconfig
+	@mkdir -p $(obj)include $(obj)board/airgoo/hmt
+	@mkdir -p $(obj)nand_spl/board/airgoo/hmt
+	@echo "#define CONFIG_NAND_U_BOOT" > $(obj)include/config.h
+	@$(MKCONFIG) $(@:_config=) arm arm1176 hmt airgoo s3c64xx
+	@echo "CONFIG_NAND_U_BOOT = y" >> $(obj)include/config.mk
+
 #========================================================================
 # i386
 #========================================================================

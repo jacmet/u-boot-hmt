@@ -1,14 +1,6 @@
-/*
- * (C) Copyright 2002
- * Sysgo Real-Time Solutions, GmbH <www.elinos.com>
- * Marius Groeger <mgroeger@sysgo.de>
- * Gary Jennejohn <garyj@denx.de>
- * David Mueller <d.mueller@elsoft.ch>
+/* (C) Copyright 2009 Peter Korsgaard <jacmet@sunsite.dk>
  *
- * (C) Copyright 2008
- * Guennadi Liakhovetki, DENX Software Engineering, <lg@denx.de>
- *
- * Configuation settings for the SAMSUNG SMDK6400(mDirac-III) board.
+ * Configuation settings for the Airgoo HMT board.
  *
  * See file CREDITS for list of people who contributed to this
  * project.
@@ -36,18 +28,14 @@
  * High Level Configuration Options
  * (easy to change)
  */
-#define CONFIG_S3C6400		1	/* in a SAMSUNG S3C6400 SoC     */
+#define CONFIG_S3C6410		1	/* in a SAMSUNG S3C6410 SoC     */
 #define CONFIG_S3C64XX		1	/* in a SAMSUNG S3C64XX Family  */
-#define CONFIG_SMDK6400		1	/* on a SAMSUNG SMDK6400 Board  */
+#define CONFIG_HMT		1	/* on a Airgoo HMT Board        */
 
 #define CONFIG_SYS_SDRAM_BASE	0x50000000
 
 /* input clock of PLL: SMDK6400 has 12MHz input clock */
 #define CONFIG_SYS_CLK_FREQ	12000000
-
-#if !defined(CONFIG_NAND_SPL) && (TEXT_BASE >= 0xc0000000)
-#define CONFIG_ENABLE_MMU
-#endif
 
 #define CONFIG_MEMORY_UPPER_CODE
 
@@ -58,10 +46,9 @@
 /*
  * Architecture magic and machine type
  */
-#define MACH_TYPE		1626
+#define MACH_TYPE		2254
 
 #define CONFIG_DISPLAY_CPUINFO
-#define CONFIG_DISPLAY_BOARDINFO
 
 #undef CONFIG_SKIP_RELOCATE_UBOOT
 
@@ -72,16 +59,10 @@
 #define CONFIG_SYS_GBL_DATA_SIZE	128	/* size in bytes for initial data */
 
 /*
- * Hardware drivers
- */
-//#define CONFIG_DRIVER_CS8900	1	/* we have a CS8900 on-board	*/
-//#define CS8900_BASE	  	0x18800300
-//#define CS8900_BUS16		1 	/* follow the Linux driver	*/
-
-/*
  * select serial console configuration
  */
-#define CONFIG_SERIAL3          1	/* we use SERIAL 1 on SMDK6400	*/
+
+#define CONFIG_SERIAL3          1	/* we use SERIAL 3 on SMDK6400	*/
 
 #define CONFIG_SYS_HUSH_PARSER			/* use "hush" command parser	*/
 #ifdef CONFIG_SYS_HUSH_PARSER
@@ -113,11 +94,6 @@
 #define CONFIG_CMD_LOADB
 #define CONFIG_CMD_SAVEENV
 #define CONFIG_CMD_NAND
-#if defined(CONFIG_BOOT_ONENAND)
-#define CONFIG_CMD_ONENAND
-#endif
-//#define CONFIG_CMD_PING
-//#define CONFIG_CMD_ELF
 
 #endif
 
@@ -137,7 +113,7 @@
  * Miscellaneous configurable options
  */
 #define CONFIG_SYS_LONGHELP				/* undef to save memory	      */
-#define CONFIG_SYS_PROMPT		"SMDK6400 # "	/* Monitor Command Prompt     */
+#define CONFIG_SYS_PROMPT		"hmt> "	/* Monitor Command Prompt     */
 #define CONFIG_SYS_CBSIZE		256		/* Console I/O Buffer Size    */
 #define CONFIG_SYS_PBSIZE		384		/* Print Buffer Size          */
 #define CONFIG_SYS_MAXARGS		16		/* max number of command args */
@@ -189,42 +165,31 @@
 
 #define CONFIG_SYS_NO_FLASH
 
-#define CONFIG_ENV_SIZE		0x4000	/* Total Size of Environment Sector */
 
 /*
- * SMDK6400 board specific data
+ * board specific data
  */
-
-#define CONFIG_IDENT_STRING	" for SMDK6400"
 
 /* base address for uboot */
 #define CONFIG_SYS_PHY_UBOOT_BASE	(CONFIG_SYS_SDRAM_BASE + 0x07e00000)
 /* total memory available to uboot */
 #define CONFIG_SYS_UBOOT_SIZE		(1024 * 1024)
 
-/* Put environment copies after the end of U-Boot owned RAM */
-#define CONFIG_NAND_ENV_DST	(CONFIG_SYS_UBOOT_BASE + CONFIG_SYS_UBOOT_SIZE)
-
-#ifdef CONFIG_ENABLE_MMU
-#define CONFIG_SYS_MAPPED_RAM_BASE	0xc0000000
-#define CONFIG_BOOTCOMMAND	"nand read 0xc0018000 0x60000 0x1c0000;" \
-				"bootm 0xc0018000"
-#else
 #define CONFIG_SYS_MAPPED_RAM_BASE	CONFIG_SYS_SDRAM_BASE
 #define CONFIG_BOOTCOMMAND	"nand read 0x50018000 0x60000 0x1c0000;"
-//							\
-//				"bootm 0x50018000"
-#endif
 
 /* NAND U-Boot load and start address */
 #define CONFIG_SYS_UBOOT_BASE		(CONFIG_SYS_MAPPED_RAM_BASE + 0x07e00000)
 
-#define CONFIG_ENV_OFFSET		0x0040000
+#define CONFIG_ENV_OFFSET		0x00080000
+#define CONFIG_ENV_OFFSET_REDUND	0x000c0000
+#define CONFIG_ENV_SIZE			0x00020000	/* Total Size of Environment Sector */
+#define CONFIG_ENV_SIZE_REDUND		CONFIG_ENV_SIZE
 
 /* NAND configuration */
 #define CONFIG_SYS_MAX_NAND_DEVICE	1
 #define CONFIG_SYS_NAND_BASE		0x70200010
-#define CONFIG_SYS_S3C_NAND_HWECC
+//#define CONFIG_SYS_S3C_NAND_HWECC
 
 #define CONFIG_SYS_NAND_SKIP_BAD_DOT_I	1  /* ".i" read skips bad blocks	      */
 #define CONFIG_SYS_NAND_WP		1
@@ -249,11 +214,11 @@
 #define CONFIG_SYS_NAND_5_ADDR_CYCLE
 
 /* Size of the block protected by one OOB (Spare Area in Samsung terminology) */
-#define CONFIG_SYS_NAND_ECCSIZE	CONFIG_SYS_NAND_PAGE_SIZE
+#define CONFIG_SYS_NAND_ECCSIZE	256
 /* Number of ECC bytes per OOB - S3C6400 calculates 4 bytes ECC in 1-bit mode */
-#define CONFIG_SYS_NAND_ECCBYTES	4
+#define CONFIG_SYS_NAND_ECCBYTES	3
 /* Number of ECC-blocks per NAND page */
-#define CONFIG_SYS_NAND_ECCSTEPS	(CONFIG_SYS_NAND_PAGE_SIZE / CONFIG_SYS_NAND_ECCSIZE)
+#define CONFIG_SYS_NAND_ECCSTEPS	8
 /* Size of a single OOB region */
 #define CONFIG_SYS_NAND_OOBSIZE	64
 /* Number of ECC bytes per page */
@@ -263,47 +228,23 @@
 				 48, 49, 50, 51, 52, 53, 54, 55, \
 				 56, 57, 58, 59, 60, 61, 62, 63}
 
-#define CONFIG_SYS_64BIT_VSPRINTF		/* needed for nand_util.c */
-
 /* Boot configuration (define only one of next 3) */
 #define CONFIG_BOOT_NAND
-/* None of these are currently implemented. Left from the original Samsung
- * version for reference
-#define CONFIG_BOOT_NOR
-#define CONFIG_BOOT_MOVINAND
-#define CONFIG_BOOT_ONENAND
-*/
-
 #define CONFIG_NAND
 #define CONFIG_NAND_S3C64XX
-/* Unimplemented or unsupported. See comment above.
-#define CONFIG_ONENAND
-#define CONFIG_MOVINAND
-*/
-
-//#define CONFIG_MTD_DEBUG
-//#define CONFIG_MTD_DEBUG_VERBOSE 2
 
 /* Settings as above boot configuration */
-//#define CONFIG_ENV_IS_IN_NAN
-#define CONFIG_ENV_IS_NOWHERE
-#define CONFIG_BOOTARGS		"console=ttySAC2,115200"
+#define CONFIG_ENV_IS_IN_NAND
+#define CONFIG_BOOTARGS		"console=ttySAC2,115200 console=tty root=/dev/mtdblock4"
 
-#if !defined(CONFIG_ENABLE_MMU) && 0
-#define CONFIG_CMD_USB			1
-#define CONFIG_USB_S3C64XX
-#define CONFIG_USB_OHCI_NEW		1
-#define CONFIG_SYS_USB_OHCI_REGS_BASE		0x74300000
-#define CONFIG_SYS_USB_OHCI_SLOT_NAME		"s3c6400"
-#define CONFIG_SYS_USB_OHCI_MAX_ROOT_PORTS	3
-#define CONFIG_SYS_USB_OHCI_CPU_INIT		1
+#define CONFIG_HARD_I2C				/* I2C with hardware support */
+#undef CONFIG_SOFT_I2C				/* I2C bit-banged */
+#define CONFIG_HARD_I2C			/* I2C with hardware support */
+#define CONFIG_SYS_I2C_SPEED		100000	/* I2C speed */
+#define CONFIG_SYS_I2C_SLAVE		0x7F	/* I2C slave addr */
+#define CONFIG_I2C_CMD_TREE
+#define CONFIG_DRIVER_S3C24X0_I2C	1	/* we use the buildin I2C controller */
 
-#define CONFIG_USB_STORAGE	1
-#endif
-//#define CONFIG_DOS_PARTITION	1
-
-#if defined(CONFIG_USB_OHCI_NEW) && defined(CONFIG_ENABLE_MMU)
-# error "usb_ohci.c is currently broken with MMU enabled."
-#endif
+#define CONFIG_CMD_I2C
 
 #endif	/* __CONFIG_H */

@@ -29,7 +29,7 @@
 #include <common.h>
 #if defined(CONFIG_S3C2400)
 #include <s3c2400.h>
-#elif defined(CONFIG_S3C2410)
+#elif defined(CONFIG_S3C2410) || defined(CONFIG_S3C64XX)
 #include <s3c2410.h>
 #endif
 #include <i2c.h>
@@ -439,4 +439,15 @@ int i2c_write (uchar chip, uint addr, int alen, uchar * buffer, int len)
 		(I2C_WRITE, chip << 1, &xaddr[4 - alen], alen, buffer,
 		 len) != 0);
 }
+
+int i2c_set_bus_speed(unsigned int speed)
+{
+	return 0;
+}
+
+unsigned int i2c_get_bus_speed(void)
+{
+	return 0;
+}
+
 #endif	/* CONFIG_HARD_I2C */
