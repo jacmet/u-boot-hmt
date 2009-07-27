@@ -280,7 +280,7 @@ int i2c_transfer (unsigned char cmd_type,
 	case I2C_READ:
 		if (addr && addr_len) {
 			i2c->IICSTAT = I2C_MODE_MT | I2C_TXRX_ENA;
-			i2c->IICDS = chip;
+			i2c->IICDS = chip & 0xfe;
 			/* send START */
 			i2c->IICSTAT |= I2C_START_STOP;
 			result = WaitForXfer ();
@@ -361,7 +361,7 @@ int i2c_probe (uchar chip)
 	 * address was <ACK>ed (i.e. there was a chip at that address which
 	 * drove the data line low).
 	 */
-	return (i2c_transfer (I2C_READ, chip << 1, 0, 0, buf, 1) != I2C_OK);
+	return (i2c_transfer (I2C_READ, (chip << 1) | 1, 0, 0, buf, 1) != I2C_OK);
 }
 
 int i2c_read (uchar chip, uint addr, int alen, uchar * buffer, int len)
@@ -397,7 +397,7 @@ int i2c_read (uchar chip, uint addr, int alen, uchar * buffer, int len)
 		chip |= ((addr >> (alen * 8)) & CONFIG_SYS_I2C_EEPROM_ADDR_OVERFLOW);
 #endif
 	if ((ret =
-	     i2c_transfer (I2C_READ, chip << 1, &xaddr[4 - alen], alen,
+	     i2c_transfer (I2C_READ, (chip << 1) | 1, &xaddr[4 - alen], alen,
 			   buffer, len)) != 0) {
 		printf ("I2c read: failed %d\n", ret);
 		return 1;
