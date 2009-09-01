@@ -29,8 +29,17 @@
 #include <common.h>
 #if defined(CONFIG_S3C2400)
 #include <s3c2400.h>
-#elif defined(CONFIG_S3C2410) || defined(CONFIG_S3C64XX)
+#elif defined(CONFIG_S3C2410)
 #include <s3c2410.h>
+#elif defined(CONFIG_S3C64XX)
+#define S3C24X0_SPI_CHANNELS 1
+#include <s3c24x0.h>
+#include <s3c6400.h>
+
+static inline S3C24X0_I2C * S3C24X0_GetBase_I2C(void)
+{
+	return (S3C24X0_I2C * const)ELFIN_I2C0_BASE;
+}
 #endif
 #include <i2c.h>
 
@@ -58,6 +67,9 @@
 
 static int GetI2CSDA(void)
 {
+#ifdef CONFIG_S3C64XX
+	return (GPBDAT_REG & 0x0040) >> 6;
+#else
 	S3C24X0_GPIO * const gpio = S3C24X0_GetBase_GPIO();
 
 #ifdef CONFIG_S3C2410
@@ -65,6 +77,7 @@ static int GetI2CSDA(void)
 #endif
 #ifdef CONFIG_S3C2400
 	return (gpio->PGDAT & 0x0020) >> 5;
+#endif
 #endif
 }
 
@@ -77,6 +90,9 @@ static void SetI2CSDA(int x)
 
 static void SetI2CSCL(int x)
 {
+#ifdef CONFIG_S3C64XX
+	GPBDAT_REG = (GPBDAT_REG & ~0x0020) | (x&1) << 5;
+#else
 	S3C24X0_GPIO * const gpio = S3C24X0_GetBase_GPIO();
 
 #ifdef CONFIG_S3C2410
@@ -84,6 +100,7 @@ static void SetI2CSCL(int x)
 #endif
 #ifdef CONFIG_S3C2400
 	gpio->PGDAT = (gpio->PGDAT & ~0x0040) | (x&1) << 6;
+#endif
 #endif
 }
 
@@ -121,9 +138,13 @@ static void ReadWriteByte (void)
 void i2c_init (int speed, int slaveadd)
 {
 	S3C24X0_I2C *const i2c = S3C24X0_GetBase_I2C ();
-	S3C24X0_GPIO *const gpio = S3C24X0_GetBase_GPIO ();
 	ulong freq, pres = 16, div;
 	int i, status;
+
+#ifdef CONFIG_S3C64XX
+	/* make sure i2c core is clocked */
+	PCLK_GATE_REG |= 0x20000;
+#endif
 
 	/* wait for some time to give previous transfer a chance to finish */
 
@@ -136,11 +157,17 @@ void i2c_init (int speed, int slaveadd)
 	}
 
 	if ((status & I2CSTAT_BSY) || GetI2CSDA () == 0) {
+#ifdef CONFIG_S3C64XX
+		ulong old_gpbcon = GPBCON_REG;
+#else
+		S3C24X0_GPIO *const gpio = S3C24X0_GetBase_GPIO ();
+
 #ifdef CONFIG_S3C2410
 		ulong old_gpecon = gpio->GPECON;
 #endif
 #ifdef CONFIG_S3C2400
 		ulong old_gpecon = gpio->PGCON;
+#endif
 #endif
 		/* bus still busy probably by (most) previously interrupted transfer */
 
@@ -151,6 +178,10 @@ void i2c_init (int speed, int slaveadd)
 #ifdef CONFIG_S3C2400
 		/* set I2CSDA and I2CSCL (PG5, PG6) to GPIO */
 		gpio->PGCON = (gpio->PGCON & ~0x00003c00) | 0x00001000;
+#endif
+#ifdef CONFIG_S3C64XX
+		/* set I2CSDA as gpio input and I2CSCL as gpio output */
+		GPBCON_REG = (GPBCON_REG & ~0xff00000) | 0x100000;
 #endif
 
 		/* toggle I2CSCL until bus idle */
@@ -174,6 +205,9 @@ void i2c_init (int speed, int slaveadd)
 #ifdef CONFIG_S3C2400
 		gpio->PGCON = old_gpecon;
 #endif
+#ifdef CONFIG_S3C64XX
+		GPBCON_REG = old_gpbcon;
+#endif
 	}
 
 	/* calculate prescaler and divisor values */
@@ -196,6 +230,9 @@ void i2c_init (int speed, int slaveadd)
 	/* program Master Transmit (and implicit STOP) */
 	i2c->IICSTAT = I2C_MODE_MT | I2C_TXRX_ENA;
 
+#ifdef CONFIG_S3C64XX
+	i2c->IICLC = 0;
+#endif
 }
 
 /*
@@ -240,6 +277,7 @@ int i2c_transfer (unsigned char cmd_type,
 	case I2C_WRITE:
 		if (addr && addr_len) {
 			i2c->IICDS = chip;
+			udelay(50);
 			/* send START */
 			i2c->IICSTAT = I2C_MODE_MT | I2C_TXRX_ENA | I2C_START_STOP;
 			i = 0;
@@ -258,6 +296,7 @@ int i2c_transfer (unsigned char cmd_type,
 			}
 		} else {
 			i2c->IICDS = chip;
+			udelay(50);
 			/* send START */
 			i2c->IICSTAT = I2C_MODE_MT | I2C_TXRX_ENA | I2C_START_STOP;
 			i = 0;
@@ -281,6 +320,7 @@ int i2c_transfer (unsigned char cmd_type,
 		if (addr && addr_len) {
 			i2c->IICSTAT = I2C_MODE_MT | I2C_TXRX_ENA;
 			i2c->IICDS = chip & 0xfe;
+			udelay(50);
 			/* send START */
 			i2c->IICSTAT |= I2C_START_STOP;
 			result = WaitForXfer ();
@@ -294,6 +334,7 @@ int i2c_transfer (unsigned char cmd_type,
 				}
 
 				i2c->IICDS = chip;
+				udelay(50);
 				/* resend START */
 				i2c->IICSTAT =  I2C_MODE_MR | I2C_TXRX_ENA |
 						I2C_START_STOP;
@@ -316,6 +357,7 @@ int i2c_transfer (unsigned char cmd_type,
 		} else {
 			i2c->IICSTAT = I2C_MODE_MR | I2C_TXRX_ENA;
 			i2c->IICDS = chip;
+			udelay(50);
 			/* send START */
 			i2c->IICSTAT |= I2C_START_STOP;
 			result = WaitForXfer ();

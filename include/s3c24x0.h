@@ -335,6 +335,7 @@ typedef struct {
 	S3C24X0_REG32	IICSTAT;
 	S3C24X0_REG32	IICADD;
 	S3C24X0_REG32	IICDS;
+	S3C24X0_REG32	IICLC;
 } /*__attribute__((__packed__))*/ S3C24X0_I2C;
 
 

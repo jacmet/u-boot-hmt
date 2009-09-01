@@ -650,6 +650,11 @@
 #define WTDAT_REG		__REG(0x7E004008)
 #define WTCNT_REG		__REG(0x7E00400C)
 
+/*
+ * I2C
+ */
+#define ELFIN_I2C0_BASE		0x7F004000
+#define ELFIN_I2C1_BASE		0x7F00F000
 
 /*
  * UART
