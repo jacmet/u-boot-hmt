@@ -69,10 +69,17 @@ lowlevel_init:
 	/* init system clock */
 	bl system_clock_init
 
-#ifndef CONFIG_NAND_SPL
-	/* for UART */
-	bl uart_asm_init
-#endif
+	/* Function keys LEDs  */
+	ldr	r0, =ELFIN_GPIO_BASE
+	ldr	r1, =0x55555555
+	str	r1, [r0, #GPOCON_OFFSET]
+
+	ldr	r1, =0xf000
+	str	r1, [r0, #GPODAT_OFFSET]
+
+	/* UART2 */
+	ldr	r1, =0x2200022
+	str	r1, [r0, #GPBCON_OFFSET]
 
 #ifdef CONFIG_BOOT_NAND
 	/* simple init for NAND */
@@ -180,9 +187,8 @@ check_syncack:
 	ldr	r1, =0x0
 	str	r1, [r0, #EPLL_CON1_OFFSET]
 
-	/* APLL, MPLL, EPLL select to Fout */
-	ldr	r1, [r0, #CLK_SRC_OFFSET]
-	orr	r1, r1, #0x7
+	/* APLL, MPLL, EPLL select to Fout, UART from MPLL */
+	ldr	r1, =0x2007
 	str	r1, [r0, #CLK_SRC_OFFSET]
 
 	/* wait at least 200us to stablize all clock */
@@ -198,18 +204,6 @@ check_syncack:
 #endif
 	mov	pc, lr
 
-
-#ifndef CONFIG_NAND_SPL
-/*
- * uart_asm_init: Initialize UART's pins
- */
-uart_asm_init:
-	/* set GPIO to enable UART */
-	ldr	r0, =ELFIN_GPIO_BASE
-	ldr	r1, =0x220022
-	str	r1, [r0, #GPACON_OFFSET]
-	mov	pc, lr
-#endif
 
 #ifdef CONFIG_BOOT_NAND
 /*

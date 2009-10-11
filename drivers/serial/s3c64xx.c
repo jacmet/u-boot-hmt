@@ -68,21 +68,22 @@ static const int udivslot[] = {
 
 void serial_setbrg(void)
 {
+#if 1
 	DECLARE_GLOBAL_DATA_PTR;
 	s3c64xx_uart *const uart = s3c64xx_get_base_uart(UART_NR);
-	u32 pclk = get_PCLK();
+	u32 pclk = 66000000;//get_PCLK();
 	u32 baudrate = gd->baudrate;
 	int i;
 
-	i = (pclk / baudrate) % 16;
+	i = 12;//(pclk / baudrate) % 16;
 
-	uart->UBRDIV = pclk / baudrate / 16 - 1;
+	uart->UBRDIV = 34;//pclk / baudrate / 16 - 1;
 	uart->UDIVSLOT = udivslot[i];
 
 	for (i = 0; i < 100; i++)
 		barrier();
+#endif
 }
-
 /*
  * Initialise the serial port with the given baudrate. The settings
  * are always 8 data bits, no parity, 1 stop bit, no start bits.

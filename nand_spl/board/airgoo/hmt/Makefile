@@ -41,7 +41,7 @@ nandobj	:= $(OBJTREE)/nand_spl/
 
 ALL	= $(nandobj)u-boot-spl $(nandobj)u-boot-spl.bin $(nandobj)u-boot-spl-16k.bin
 
-all:	$(obj).depend $(ALL)
+all:	$(ALL)
 
 $(nandobj)u-boot-spl-16k.bin: $(nandobj)u-boot-spl
 	$(OBJCOPY) ${OBJCFLAGS} --pad-to=$(PAD_TO) -O binary $< $@

@@ -162,9 +162,9 @@ static int nand_read_page(struct mtd_info *mtd, int block, int page, uchar *dst)
 	oob_data = ecc_calc + 0x200;
 
 	for (i = 0; eccsteps; eccsteps--, i += eccbytes, p += eccsize) {
-		this->ecc.hwctl(mtd, NAND_ECC_READ);
+//		this->ecc.hwctl(mtd, NAND_ECC_READ);
 		this->read_buf(mtd, p, eccsize);
-		this->ecc.calculate(mtd, p, &ecc_calc[i]);
+//		this->ecc.calculate(mtd, p, &ecc_calc[i]);
 	}
 	this->read_buf(mtd, oob_data, CONFIG_SYS_NAND_OOBSIZE);
 
@@ -180,9 +180,8 @@ static int nand_read_page(struct mtd_info *mtd, int block, int page, uchar *dst)
 		 * from correct_data(). We just hope that all possible errors
 		 * are corrected by this routine.
 		 */
-		stat = this->ecc.correct(mtd, p, &ecc_code[i], &ecc_calc[i]);
+//		stat = this->ecc.correct(mtd, p, &ecc_code[i], &ecc_calc[i]);
 	}
-
 	return 0;
 }
 

@@ -198,8 +198,8 @@
 #define CONFIG_SYS_NAND_U_BOOT_DST	CONFIG_SYS_PHY_UBOOT_BASE	/* NUB load-addr      */
 #define CONFIG_SYS_NAND_U_BOOT_START	CONFIG_SYS_NAND_U_BOOT_DST	/* NUB start-addr     */
 
-#define CONFIG_SYS_NAND_U_BOOT_OFFS	(4 * 1024)	/* Offset to RAM U-Boot image */
-#define CONFIG_SYS_NAND_U_BOOT_SIZE	(252 * 1024)	/* Size of RAM U-Boot image   */
+#define CONFIG_SYS_NAND_U_BOOT_OFFS	(8192)	/* Offset to RAM U-Boot image */
+#define CONFIG_SYS_NAND_U_BOOT_SIZE	(248 * 1024)	/* Size of RAM U-Boot image   */
 
 /* NAND chip page size		*/
 #define CONFIG_SYS_NAND_PAGE_SIZE	2048
@@ -213,11 +213,11 @@
 #define CONFIG_SYS_NAND_5_ADDR_CYCLE
 
 /* Size of the block protected by one OOB (Spare Area in Samsung terminology) */
-#define CONFIG_SYS_NAND_ECCSIZE	256
+#define CONFIG_SYS_NAND_ECCSIZE	2048
 /* Number of ECC bytes per OOB - S3C6400 calculates 4 bytes ECC in 1-bit mode */
 #define CONFIG_SYS_NAND_ECCBYTES	3
 /* Number of ECC-blocks per NAND page */
-#define CONFIG_SYS_NAND_ECCSTEPS	8
+#define CONFIG_SYS_NAND_ECCSTEPS	1
 /* Size of a single OOB region */
 #define CONFIG_SYS_NAND_OOBSIZE	64
 /* Number of ECC bytes per page */
