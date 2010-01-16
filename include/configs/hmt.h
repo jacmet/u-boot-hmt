@@ -155,10 +155,9 @@
 #define CONFIG_SYNC_MODE
 */
 
-/* SMDK6400 has 2 banks of DRAM, but we use only one in U-Boot */
 #define CONFIG_NR_DRAM_BANKS	1
 #define PHYS_SDRAM_1		CONFIG_SYS_SDRAM_BASE	/* SDRAM Bank #1	*/
-#define PHYS_SDRAM_1_SIZE	0x08000000	/* 128 MB in Bank #1	*/
+#define PHYS_SDRAM_1_SIZE	0x10000000	/* 128 MB in Bank #1	*/
 
 /* #define CONFIG_SYS_FLASH_BASE		0x10000000 */
 /* #define CONFIG_SYS_MONITOR_BASE	0x00000000 */
@@ -243,7 +242,7 @@
 #define CONFIG_SYS_I2C_SPEED		100000	/* I2C speed */
 #define CONFIG_SYS_I2C_SLAVE		0x7F	/* I2C slave addr */
 #define CONFIG_I2C_CMD_TREE
-#define CONFIG_DRIVER_S3C24X0_I2C	1	/* we use the buildin I2C controller */
+#define CONFIG_DRIVER_S3C24X0_I2C	1	/* we use the builtin I2C controller */
 
 #define CONFIG_CMD_I2C
 

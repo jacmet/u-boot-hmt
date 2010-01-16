@@ -823,9 +823,9 @@
 /*-----------------------------------------------------------------------
  * Physical Memory Map
  */
-#define DMC1_MEM_CFG	0x80010012	/* Chip1, Burst4, Row/Column bit */
+#define DMC1_MEM_CFG	0x8001001a	/* Chip1, Burst4, Row/Column bit */
 #define DMC1_MEM_CFG2	0xB45
-#define DMC1_CHIP0_CFG	0x150F8		/* 0x4000_0000 ~ 0x43ff_ffff (64MB) */
+#define DMC1_CHIP0_CFG	0x150F0		/* 0x4000_0000 ~ 0x43ff_ffff (64MB) */
 #define DMC_DDR_32_CFG	0x0 		/* 32bit, DDR */
 
 /* Memory Parameters */
