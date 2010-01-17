@@ -246,4 +246,6 @@
 
 #define CONFIG_CMD_I2C
 
+#define CONFIG_MISC_INIT_R    		/* call board_misc_init running from ram */
+
 #endif	/* __CONFIG_H */

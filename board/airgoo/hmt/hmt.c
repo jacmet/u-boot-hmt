@@ -21,6 +21,16 @@
 
 #include <common.h>
 #include <s3c6400.h>
+#include <i2c.h>
+
+#define MAX8698_ONOFF1	0
+#define MAX8698_ONOFF2	1
+#define MAX8698_LDO9	14
+
+static int max8698_write(unsigned char reg, unsigned char val)
+{
+	return i2c_write(0x66, reg, 1, &val, 1);
+}
 
 int board_init(void)
 {
